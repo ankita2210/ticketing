@@ -24,17 +24,21 @@ router.put(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
+    console.log("here...")
     const ticket = await Ticket.findById(req.params.id);
 
     if (!ticket) {
+      console.log("here...1")
       throw new NotFoundError();
     }
 
     if (ticket.orderId) {
+      console.log("here...2")
       throw new BadRequestError('Cannot edit a reserved ticket');
     }
 
     if (ticket.userId !== req.currentUser!.id) {
+      console.log("here...3")
       throw new NotAuthorizedError();
     }
 

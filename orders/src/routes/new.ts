@@ -29,16 +29,19 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { ticketId } = req.body;
+    console.log("here...")
 
     // Find the ticket the user is trying to order in the database
     const ticket = await Ticket.findById(ticketId);
     if (!ticket) {
+      console.log("here...1")
       throw new NotFoundError();
     }
 
     // Make sure that this ticket is not already reserved
     const isReserved = await ticket.isReserved();
     if (isReserved) {
+      console.log("here...2")
       throw new BadRequestError('Ticket is already reserved');
     }
 
@@ -58,6 +61,7 @@ router.post(
     // Publish an event saying that an order was created
     new OrderCreatedPublisher(natsWrapper.client).publish({
       id: order.id,
+      version: order.version,
       status: order.status,
       userId: order.userId,
       expiresAt: order.expiresAt.toISOString(),
@@ -66,6 +70,7 @@ router.post(
         price: ticket.price,
       },
     });
+    console.log("here...")
 
 
     res.status(201).send(order);
